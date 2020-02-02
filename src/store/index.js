@@ -3,13 +3,35 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   state: {
+    token: '',
+    user: null,
+    isUserLogin: false
   },
   mutations: {
+    setToken (state, token) {
+      state.token = token
+      if (token) {
+        state.isUserLogin = true
+      } else {
+        state.isUserLogin = false
+      }
+    },
+    setUser (state, user) {
+      state.user = user
+    }
   },
   actions: {
-  },
-  modules: {
+    setToken ({ commit }, token) {
+      commit('setToken', token)
+    },
+    setUser ({ commit }, user) {
+      commit('setUser', user)
+    },
+    setLoadingInstance ({ commit }, loadingInstance) {
+      commit('setLoadingInstance', loadingInstance)
+    }
   }
 })
+export default store
