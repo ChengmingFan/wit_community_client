@@ -1,11 +1,11 @@
 <template>
   <el-row class="main-container">
-    <el-col :xs="24" :sm="8" :md="8" :lg="6" :xl="6">
+    <el-col :xs="24" :sm="24" :md="8" :lg="6" :xl="6">
       <div style="width: 200px">
         <el-menu id="sideBar"
                  default-active="1"
                  class="el-menu-vertical-demo">
-          <el-menu-item index="1" @click="showSubarea('Popular',0)">
+          <el-menu-item index="1" @click="loadPopular">
             <i class="el-icon-thumb"></i>
             <span slot="title">popular</span>
           </el-menu-item>
@@ -36,7 +36,7 @@
         </el-menu>
       </div>
     </el-col>
-    <el-col :xs="24" :sm="16" :md="16" :lg="18" :xl="18">
+    <el-col :xs="24" :sm="24" :md="16" :lg="18" :xl="18">
       <div id="post">
         <h1 id="subareaTitle">{{categoryName}}</h1>
         <el-divider/>
@@ -87,7 +87,7 @@ export default {
     }
   },
   async created () {
-    await this.loadPosts()
+    await this.loadPopular()
   },
   methods: {
     loadPosts: function () {
@@ -95,12 +95,7 @@ export default {
         .then(response => {
           this.categoryName = 'All'
           this.allPosts = response.data.posts
-          var showPosts = this.allPosts.slice(0, 3)
-          for (var i = 0; i < showPosts.length; i++) {
-            showPosts[i].createdTime = moment(showPosts[i].createdTime).format('YYYY-MM-DD HH:mm')
-          }
-          this.showPosts = showPosts
-          this.total = this.allPosts.length
+          this.formatPost()
         })
         .catch(error => {
           this.errors.push(error)
@@ -129,20 +124,30 @@ export default {
       PostService.getSubareaPost(key)
         .then(response => {
           this.allPosts = response.data.posts
-          var showPosts = this.allPosts.slice(0, 3)
-          for (var i = 0; i < showPosts.length; i++) {
-            showPosts[i].createdTime = moment(showPosts[i].createdTime).format('YYYY-MM-DD HH:mm')
-          }
-          this.showPosts = showPosts
-          this.total = this.allPosts.length
+          this.formatPost()
         })
         .catch(error => {
           this.errors.push(error)
         })
     },
     loadPopular () {
-      this.categoryName = 'Popular'
       PostService.getPopular()
+        .then(response => {
+          this.categoryName = 'Popular'
+          this.allPosts = response.data.posts
+          this.formatPost()
+        })
+        .catch(error => {
+          this.errors.push(error)
+        })
+    },
+    formatPost () {
+      var showPosts = this.allPosts.slice(0, 3)
+      for (var i = 0; i < showPosts.length; i++) {
+        showPosts[i].createdTime = moment(showPosts[i].createdTime).format('YYYY-MM-DD HH:mm')
+      }
+      this.showPosts = showPosts
+      this.total = this.allPosts.length
     }
   }
 }

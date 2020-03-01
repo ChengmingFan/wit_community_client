@@ -3,7 +3,8 @@ import VueRouter from 'vue-router'
 import global from '../views/layout/global'
 import Index from '../views/Index'
 import Create from '../views/post/Create'
-//
+import Detail from '../views/post/Detail'
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -19,7 +20,8 @@ const routes = [
     path: '/post',
     component: global,
     children: [
-      { path: 'create', name: 'post-create', component: Create }
+      { path: 'create', name: 'post-create', component: Create },
+      { path: 'detail', name: 'post-detail', component: Detail }
     ]
   }
 ]

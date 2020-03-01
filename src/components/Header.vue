@@ -1,38 +1,42 @@
 <template>
-  <div id="top">
-    <p @click=toIndex>WIT Community</p>
-    <el-input id="search"  style="width: 20%;margin-left: auto;margin-right: auto" v-model="keywords"
-              placeholder="search post here ..." @keyup.enter.native="onEnterSearch">
-      <i slot="prefix" class="el-input__icon el-icon-search" style="margin-left: -20px"></i>
-    </el-input>
-    <div>
-      <template v-if="!$store.state.isUserLogin">
-        <span @click="login">Log in</span>&nbsp;
-        <span @click="register">Sign up</span>
-      </template>
-      <template v-else>
+  <el-row>
+    <el-col>
+      <div id="top">
+        <p @click=toIndex>WIT Community</p>
+        <el-input id="search"  style="width: 20%;margin-left: auto;margin-right: auto" v-model="keywords"
+                  placeholder="search post here ..." @keyup.enter.native="onEnterSearch" v-show="fullWidth">
+          <i slot="prefix" class="el-input__icon el-icon-search" style="margin-left: -20px"></i>
+        </el-input>
         <div>
-          <span @click="$router.push('/post/create')" style="font-size: 25px"><i class="el-icon-edit-outline"></i></span>
-          <span><i class="el-icon-bell" style="font-size: 25px"></i></span>
-          <span><i class="el-icon-message" style="font-size: 25px"></i></span>
-          <el-dropdown>
+          <template v-if="!$store.state.isUserLogin">
+            <span @click="login">Log in</span>&nbsp;
+            <span @click="register">Sign up</span>
+          </template>
+          <template v-else>
+            <div style="position: fixed;right: 0;top:10px; text-align: center;margin-top: 0" >
+              <span @click="$router.push('/post/create')" style="font-size: 25px" v-show="fullWidth"><i class="el-icon-edit-outline"></i></span>
+              <span v-show="fullWidth"><i class="el-icon-bell" style="font-size: 25px"></i></span>
+              <span v-show="fullWidth"><i class="el-icon-message" style="font-size: 25px"></i></span>
+              <el-dropdown>
                       <span class="el-dropdown-link" style="font-size: 20px">
                         {{$store.state.user.username}}<i class="el-icon-arrow-down el-icon--right"></i>
                       </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item><span @click="$router.push('/user/update')">Update Info</span></el-dropdown-item>
-              <el-dropdown-item><span @click="logout">Logout</span></el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
+                <el-dropdown-menu slot="dropdown">
+                  <el-dropdown-item><span @click="$router.push('/user/update')">Update Info</span></el-dropdown-item>
+                  <el-dropdown-item><span @click="logout">Logout</span></el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </div>
+          </template>
         </div>
-      </template>
-    </div>
-    <el-dialog :before-close="close" :title="dialogTitle" :visible.sync="dialogTableVisible" center
-               :append-to-body='true' :lock-scroll="false" width="40%">
-      <Login ref="loginDialog" v-show="loginDialogTableVisible" @register="register" v-on:hidden="close"></Login>
-      <Register ref="registerDialog" v-show="registerDialogTableVisible" v-on:login="login"></Register>
-    </el-dialog>
-  </div>
+        <el-dialog :before-close="close" :title="dialogTitle" :visible.sync="dialogTableVisible" center
+                   :append-to-body='true' :lock-scroll="false" width="40%">
+          <Login ref="loginDialog" v-show="loginDialogTableVisible" @register="register" v-on:hidden="close"></Login>
+          <Register ref="registerDialog" v-show="registerDialogTableVisible" v-on:login="login"></Register>
+        </el-dialog>
+      </div>
+    </el-col>
+  </el-row>
 </template>
 
 <script>
@@ -40,6 +44,7 @@ import Register from './Register'
 import Login from './Login'
 export default {
   name: 'header',
+  props: ['fullWidth'],
   data () {
     return {
       keywords: '',
