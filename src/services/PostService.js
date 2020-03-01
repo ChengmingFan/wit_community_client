@@ -14,5 +14,11 @@ export default {
   },
   searchPost (keywords) {
     return Api().get(`/search/${keywords}`)
+  },
+  getSubareaPost (subarea) {
+    return Api().get(`/subarea/${subarea}`)
+  },
+  getPopular () {
+    return Api().get('/popular')
   }
 }

@@ -78,7 +78,7 @@ export default {
               this.$store.dispatch('setToken', response.data.token)
               this.$store.dispatch('setUser', response.data.user)
               this.hidden()
-              this.$router.push('/post/list')
+              this.$router.push('/')
             }
           } catch (e) {
             this.$message.error('Failed to log in. Please retry later')

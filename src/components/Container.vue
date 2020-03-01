@@ -9,27 +9,27 @@
             <i class="el-icon-thumb"></i>
             <span slot="title">popular</span>
           </el-menu-item>
-          <el-menu-item index="2" @click="loadPosts">
+          <el-menu-item index="2" @click="showSubarea('All',1)">
             <i class="el-icon-view"></i>
             <span slot="title">all post</span>
           </el-menu-item>
-          <el-menu-item index="3" @click="showSubarea('Accommodation','accommodation')">
+          <el-menu-item index="3" @click="showSubarea('Accommodation',2)">
             <i class="el-icon-house"></i>
             <span slot="title">accommodation</span>
           </el-menu-item>
-          <el-menu-item index="4" @click="showSubarea('Sale','sale')">
+          <el-menu-item index="4" @click="showSubarea('Sale',3)">
             <i class="el-icon-shopping-cart-2"></i>
             <span slot="title">sale</span>
           </el-menu-item>
-          <el-menu-item index="5" @click="showSubarea('Activity','activity')">
+          <el-menu-item index="5" @click="showSubarea('Activity',4)">
             <i class="el-icon-time"></i>
             <span slot="title">activity</span>
           </el-menu-item>
-          <el-menu-item index="6" @click="showSubarea('Study','study')">
+          <el-menu-item index="6" @click="showSubarea('Study',5)">
             <i class="el-icon-notebook-2"></i>
             <span slot="title">study</span>
           </el-menu-item>
-          <el-menu-item index="7" @click="showSubarea('Other','other')">
+          <el-menu-item index="7" @click="showSubarea('Other',6)">
             <i class="el-icon-more-outline"></i>
             <span slot="title">other</span>
           </el-menu-item>
@@ -93,7 +93,6 @@ export default {
     loadPosts: function () {
       PostService.getAllPost()
         .then(response => {
-          this.categoryName = 'All'
           this.allPosts = response.data.posts
           var showPosts = this.allPosts.slice(0, 3)
           for (var i = 0; i < showPosts.length; i++) {
@@ -124,25 +123,8 @@ export default {
         }
       })
     },
-    showSubarea (name, key) {
+    showSubarea (name, cid) {
       this.categoryName = name
-      PostService.getSubareaPost(key)
-        .then(response => {
-          this.allPosts = response.data.posts
-          var showPosts = this.allPosts.slice(0, 3)
-          for (var i = 0; i < showPosts.length; i++) {
-            showPosts[i].createdTime = moment(showPosts[i].createdTime).format('YYYY-MM-DD HH:mm')
-          }
-          this.showPosts = showPosts
-          this.total = this.allPosts.length
-        })
-        .catch(error => {
-          this.errors.push(error)
-        })
-    },
-    loadPopular () {
-      this.categoryName = 'Popular'
-      PostService.getPopular()
     }
   }
 }

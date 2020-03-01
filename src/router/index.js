@@ -1,23 +1,26 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-// import App from '../App'
 import global from '../views/layout/global'
 import Index from '../views/Index'
-
+import Create from '../views/post/Create'
+//
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    name: global
-    // component: global,
-    // children: [
-    //   { path: '/popular', name: 'Default', component: PostArea }
-    // ]
+    // name: global,
+    component: global,
+    children: [
+      { path: '', name: 'Default', component: Index }
+    ]
   },
   {
-    path: '/homepage',
-    component: Index
+    path: '/post',
+    component: global,
+    children: [
+      { path: 'create', name: 'post-create', component: Create }
+    ]
   }
 ]
 
