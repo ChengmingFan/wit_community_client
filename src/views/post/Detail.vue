@@ -30,7 +30,12 @@
                   <span v-show="($store.state.isUserLogin && comment.creatorId === $store.state.user._id) || isPoster" id="btn-delete" class="el-icon-close" @click="deleteComment(comment._id)"></span>
                 </div>
                 <p>{{comment.content}}</p>
-                <span class="post-info">{{comment.createdTime}}</span>
+                <div>
+                  <span><img class="icons" src="../../static/img/like3.png"/></span>
+                  <span><img class="icons" src="../../static/img/comment3.png"/></span>
+<!--                  <span><img class="icons" src="../../static/img/liked.png"/></span>-->
+                  <span class="post-info" id="comment-time">{{comment.createdTime}}</span>
+                </div>
               </el-main>
             </el-container>
             <el-divider class="comment-divider"/>
@@ -168,6 +173,7 @@ export default {
 
   .main-container {
     background: white;
+    border-radius: 15px;
   }
 
   .post-container {
@@ -176,6 +182,7 @@ export default {
   }
 
   .post-creator {
+    border-radius: 15px;
     background: white;
     height: 100%;
   }
@@ -232,5 +239,15 @@ export default {
     cursor: pointer;
     position: relative;
     margin-left: 90%;
+  }
+
+  #comment-time {
+    float: right;
+  }
+
+  .icons {
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
   }
 </style>

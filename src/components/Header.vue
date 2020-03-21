@@ -13,7 +13,7 @@
             <span @click="register">Sign up</span>
           </template>
           <template v-else>
-            <div style="position: fixed;right: 0;top:10px; text-align: center;margin-top: 0" >
+            <div style="position: fixed;right: 20px;top:10px; text-align: center;margin-top: 0" >
               <span @click="$router.push('/post/create')" style="font-size: 25px" v-show="fullWidth"><i class="el-icon-edit-outline"></i></span>
               <span v-show="fullWidth"><i class="el-icon-bell" style="font-size: 25px"></i></span>
               <span v-show="fullWidth"><i class="el-icon-message" style="font-size: 25px"></i></span>
@@ -22,7 +22,7 @@
                         {{$store.state.user.username}}<i class="el-icon-arrow-down el-icon--right"></i>
                       </span>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item><span @click="$router.push('/user/update')">Update Info</span></el-dropdown-item>
+                  <el-dropdown-item><span @click="$router.push('/user/profile/' + $store.state.user._id)">Profile</span></el-dropdown-item>
                   <el-dropdown-item><span @click="logout">Logout</span></el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>

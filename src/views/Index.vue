@@ -44,9 +44,9 @@
           <el-container v-for="post in showPosts" v-bind:key="post._id">
             <el-aside width="95px">
               <el-image
-                style="width: 85px; height: 85px;margin-left: 10px"
-                src="http://pic.qqkuyou.com/tximg/mfqgpgqy.jpeg"
-                fit="fit"></el-image>
+                style="width: 85px; height: 85px;margin-left: 10px;cursor: pointer"
+                :src="post.author.avatarUrl"
+                fit="fit" @click="$router.push('/user/profile/' + post.author._id)"></el-image>
             </el-aside>
             <el-main class="post-body">
               <a class="title" @click="getDetail(post._id)">{{post.title}}</a>
@@ -157,14 +157,14 @@ export default {
   #sideBar{
     border: transparent;
     margin-left: 8%;
-    width: 200px;
+    width: 250px;
     border-radius: 10px;
     margin-right: -50px;
   }
   #post{
-    margin-left: -40px;
-    height: 490px;
-    width: 920px;
+    /*margin-top: 20px;*/
+    height: 610px;
+    width: 820px;
     background: white;
     border-radius: 10px;
     margin-right: 8%;

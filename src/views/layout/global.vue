@@ -25,7 +25,6 @@ export default {
   methods: {
     page_width () {
       let screenWidth = document.body.clientWidth
-      console.log(screenWidth)
       if (screenWidth < 800) {
         this.fullWidth = false
       } else {
@@ -48,6 +47,6 @@ export default {
     color: gray;
   }
   #container {
-    padding: 13px;
+    padding: 30px;
   }
 </style>

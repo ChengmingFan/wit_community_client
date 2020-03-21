@@ -13,5 +13,8 @@ export default {
   update (data) {
     return Api().put('/user/update', data,
       { headers: { 'Authorization': 'Bearer ' + store.state.token } })
+  },
+  getUserById (id) {
+    return Api().get(`/user/${id}`)
   }
 }
