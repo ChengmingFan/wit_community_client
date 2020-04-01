@@ -16,5 +16,11 @@ export default {
   },
   getUserById (id) {
     return Api().get(`/user/${id}`)
+  },
+  getPostsByUserID (id) {
+    return Api().get(`/post/user/${id}`)
+  },
+  getCommentsByUserId (id) {
+    return Api().get(`/comment/user/${id}`)
   }
 }

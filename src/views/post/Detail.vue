@@ -4,7 +4,7 @@
       <div class="post-container">
         <h1>{{post.title}}</h1>
         <div class="post-info">
-          <span>Author: {{(post.author)}} | </span>
+          <span>Author: {{post.author.username}} | </span>
           <span>Time: {{post.createdTime}} | </span>
           <span>Views: {{post.viewCount}} </span>
         </div>
@@ -20,19 +20,19 @@
             <el-container>
               <el-aside width="auto">
                 <el-image
-                  style="width: 80px; height: 80px"
-                  src="https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg"
+                  style="width: 90px; height: 90px"
+                  :src="comment.author.avatarUrl"
                   fit="fit"></el-image>
               </el-aside>
               <el-main class="comment-body">
                 <div style="display: inline">
-                  <a class="username" href="www.baidu.com">{{(comment.author)}}</a>
+                  <a class="username" @click="$router.push('/user/profile/' + comment.creatorId)">{{(comment.author.username)}}</a>
                   <span v-show="($store.state.isUserLogin && comment.creatorId === $store.state.user._id) || isPoster" id="btn-delete" class="el-icon-close" @click="deleteComment(comment._id)"></span>
                 </div>
                 <p>{{comment.content}}</p>
                 <div>
-                  <span><img class="icons" src="../../static/img/like3.png"/></span>
-                  <span><img class="icons" src="../../static/img/comment3.png"/></span>
+                  <span class="icons" @click="likeComment(comment._id)"><img src="../../static/img/like.png"/>{{comment.likeCount}}</span>
+                  <span class="icons" @click="showComments(comment._id)"><img src="../../static/img/comment.png"/>{{comment.commentCount}}</span>
 <!--                  <span><img class="icons" src="../../static/img/liked.png"/></span>-->
                   <span class="post-info" id="comment-time">{{comment.createdTime}}</span>
                 </div>
@@ -61,25 +61,34 @@
         </el-container>
       </div>
     </el-col>
+    <el-dialog  v-if='showCommentsDialog' style="margin-top: -50px" title="comments" :destroy-on-close=true :visible.sync="showCommentsDialog" width="600px" :lock-scroll="true">
+      <ShowComments  ref="showComments" v-bind:commentId="selectedCommentId"></ShowComments>
+    </el-dialog>
   </el-row>
 </template>
 
 <script>
 import PostService from '../../services/PostService'
 import CommentService from '../../services/CommentService'
+import ShowComments from '../../components/ShowComments'
 
 let moment = require('moment')
 
 export default {
   name: 'detail',
+  components: { ShowComments },
   data () {
     return {
-      post: '',
+      post: {
+        author: ''
+      },
       comments: '',
       error: '',
       comment: '',
       time: '',
-      isPoster: false
+      isPoster: false,
+      showCommentsDialog: false,
+      selectedCommentId: ''
     }
   },
   created () {
@@ -114,6 +123,7 @@ export default {
       } else {
         try {
           const response = await CommentService.comment({
+            type: 0,
             parentId: this.post._id,
             content: this.comment,
             creatorId: this.$store.state.user._id
@@ -164,7 +174,14 @@ export default {
           message: 'Cancelled'
         })
       })
+    },
+    async showComments (id) {
+      this.selectedCommentId = id
+      this.showCommentsDialog = true
     }
+  },
+  likeComment (id) {
+
   }
 }
 </script>
@@ -246,8 +263,24 @@ export default {
   }
 
   .icons {
-    width: 18px;
-    height: 18px;
-    margin-right: 5px;
+    color: gray;
+    padding-right: 10px;
+    cursor: pointer;
+    img {
+      width: 18px;
+      height: 18px;
+      margin-right: 5px;
+      vertical-align: middle;
+      margin-top: -3px;
+    }
+  }
+  .el-dialog {
+    height: 642px;
+  }
+</style>
+<style>
+  /* global styles */
+  .el-scrollbar .el-scrollbar__wrap {
+    overflow-x: hidden !important;
   }
 </style>

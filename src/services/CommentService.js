@@ -9,5 +9,11 @@ export default {
   delete (id) {
     return Api().delete(`/comment/delete/${id}`,
       { headers: { 'Authorization': 'Bearer ' + store.state.token } })
+  },
+  getComments (id) {
+    return Api().get(`/comments/${id}`)
+  },
+  likeComment (id) {
+    return Api().get(`/comment/like/${id}`)
   }
 }
