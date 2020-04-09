@@ -36,7 +36,8 @@
     <el-col :xs="0" :sm="9" :md="8" :lg="6" :xl="6">
       <div id="user-info">
         <div id="top"></div>
-        <el-avatar id="avatar" shape="square" :size="90" fit="fill" :src=user.avatarUrl></el-avatar>
+        <el-avatar v-if="user.avatarUrl" class="avatar" shape="square" :size="90" fit="fill" :src=user.avatarUrl></el-avatar>
+        <el-avatar v-else class="avatar" shape="square" :size="90" fit="fill">{{user.username}}</el-avatar>
         <div id="follow-info">
           <span>Following</span>
           <span style="margin-left: 10px">Follower</span><br/>
@@ -218,7 +219,7 @@ export default {
       background: cornflowerblue;
       height: 100px;
     }
-    #avatar{
+    .avatar{
       border-radius: 10px;
       margin-left: 15px;
       margin-top: -45px;

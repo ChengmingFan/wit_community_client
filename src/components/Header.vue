@@ -5,7 +5,7 @@
         <p @click=toIndex>WIT Community</p>
         <el-input id="search"  style="width: 20%;margin-left: auto;margin-right: auto" v-model="keywords"
                   placeholder="search post here ..." @keyup.enter.native="onEnterSearch" v-show="fullWidth">
-          <i slot="prefix" class="el-input__icon el-icon-search" style="margin-left: -20px"></i>
+          <i slot="prefix" class="el-input__icon el-icon-search" style="margin-left: 0px"></i>
         </el-input>
         <div>
           <template v-if="!$store.state.isUserLogin">
@@ -14,9 +14,19 @@
           </template>
           <template v-else>
             <div style="position: fixed;right: 20px;top:10px; text-align: center;margin-top: 0" >
-              <span @click="$router.push('/post/create')" style="font-size: 25px" v-show="fullWidth"><i class="el-icon-edit-outline"></i></span>
-              <span v-show="fullWidth"><i class="el-icon-bell" style="font-size: 25px"></i></span>
-              <span v-show="fullWidth"><i class="el-icon-message" style="font-size: 25px"></i></span>
+              <span @click="$router.push('/post/create')" style="font-size: 25px;display: inline-block;width: 50px" v-show="fullWidth"><i class="el-icon-edit-outline"></i>
+                <el-badge/>
+              </span>
+              <span v-show="fullWidth" v-popover:notification style="display: inline-block;width: 50px">
+                <i class="el-icon-bell"  style="font-size: 25px"></i>
+                <el-badge v-show="notificationNum !== 0" class="mark" :value="notificationNum" />
+                <el-popover ref="notification" placement="bottom" width="200" trigger="click" content="这是通知." ></el-popover>
+              </span>
+              <span v-show="fullWidth" v-popover:message style="display: inline-block;width: 50px">
+                <i class="el-icon-message" style="font-size: 25px"></i>
+                <el-badge v-show="messageNum !== 0" class="mark" :value="messageNum" />
+                <el-popover ref="message" placement="bottom" width="200" trigger="click" content="这是消息." style="display: none"></el-popover>
+              </span>
               <el-dropdown>
                       <span class="el-dropdown-link" style="font-size: 20px">
                         {{$store.state.user.username}}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -52,7 +62,10 @@ export default {
       dialogTitle: '',
       dialogTableVisible: false,
       loginDialogTableVisible: false,
-      registerDialogTableVisible: false
+      registerDialogTableVisible: false,
+      notificationVisible: false,
+      notificationNum: 12,
+      messageNum: 1
     }
   },
   methods: {
@@ -80,6 +93,7 @@ export default {
         message: 'Logout successfully',
         center: true
       })
+      location.reload()
     },
     onEnterSearch () {
       this.$router.push({ name: 'post-search', params: { keywords: this.keywords } })
@@ -111,7 +125,7 @@ export default {
     }
 
     span {
-      margin-left: 20px;
+      margin-left: 5px;
       cursor: pointer;
     }
     span:hover {
@@ -126,5 +140,12 @@ export default {
 
   .el-icon-arrow-down {
     font-size: 12px;
+  }
+  .mark {
+    margin-bottom: 20px;
+    margin-left: -10px;
+  }
+  .el-popper[x-placement^=bottom] {
+    margin-top: 0 !important;
   }
 </style>

@@ -7,9 +7,10 @@
             <el-upload ref="upload" class="avatar-uploader" action="http://8.208.14.10:3000/upload" :show-file-list="false"
                        :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :auto-upload="true">
               <div style="display: flex;width: 200px;margin-left: 90px">
-                <el-avatar v-if="editForm.avatarUrl"  id="avatar" shape="square" :size="80" fit="contain" :src="editForm.avatarUrl"></el-avatar>
-                <i v-if="editForm.avatarUrl" class="el-icon-camera" style="font-size: 31px;margin-left: -30px;margin-top: 52px;"/>
-                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                <el-avatar v-if="editForm.avatarUrl"  class="avatar" shape="square" :size="80" fit="fill" :src="editForm.avatarUrl"></el-avatar>
+                <el-avatar v-else  class="avatar" shape="square" :size="80" fit="fill">123</el-avatar>
+                <i class="el-icon-camera" style="font-size: 31px;margin-left: -30px;margin-top: 52px;"/>
+<!--                <i class="el-icon-plus avatar-uploader-icon"></i>-->
               </div>
             </el-upload>
           </el-col>
@@ -79,8 +80,7 @@ export default {
       },
       editRules: {
         username: { type: 'string', required: true, min: 3, max: 20, message: 'Username must be between 3 and 20 characters', trigger: 'blur' },
-        gender: { type: 'string', required: true, message: 'choose gender please' },
-        birthday: { message: 'choose birthday please' }
+        gender: { type: 'string', required: true, message: 'choose gender please' }
       }
     }
   },
@@ -175,7 +175,7 @@ export default {
     width: 40%;
     margin-top: 10px;
   }
-  #avatar{
+  .avatar{
     margin-left: 60%;
   }
   .avatar-uploader .el-upload {

@@ -13,7 +13,7 @@ export default {
   getComments (id) {
     return Api().get(`/comments/${id}`)
   },
-  likeComment (id) {
-    return Api().get(`/comment/like/${id}`)
+  likeComment (data) {
+    return Api().post(`/comment/like/`, data)
   }
 }

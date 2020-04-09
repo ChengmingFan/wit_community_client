@@ -16,13 +16,11 @@
         <h2>{{post.commentCount}} comments</h2>
         <el-divider class="comment-divider"></el-divider>
         <div class="comment-container">
-          <div v-for="comment in comments" v-bind:key="comment._id">
+          <div v-for="(comment,index) in comments" v-bind:key="comment._id">
             <el-container>
               <el-aside width="auto">
-                <el-image
-                  style="width: 90px; height: 90px"
-                  :src="comment.author.avatarUrl"
-                  fit="fit"></el-image>
+                <el-avatar v-if="comment.author.avatarUrl" style="cursor: pointer" :size="90" shape="square" fit="fit" @click.native="$router.push('/user/profile/' + comment.creatorId)" :src="comment.author.avatarUrl"> </el-avatar>
+                <el-avatar v-else style="cursor: pointer"  :size="90" shape="square" fit="fit" @click.native="$router.push('/user/profile/' + comment.creatorId)"> {{comment.author.username}} </el-avatar>
               </el-aside>
               <el-main class="comment-body">
                 <div style="display: inline">
@@ -31,9 +29,10 @@
                 </div>
                 <p>{{comment.content}}</p>
                 <div>
-                  <span class="icons" @click="likeComment(comment._id)"><img src="../../static/img/like.png"/>{{comment.likeCount}}</span>
+                  <span class="icons" @click="likeComment(comment._id,1,index)" v-if="likedComments.indexOf(comment._id) < 0"><img src="../../static/img/like.png"/>{{comment.likeCount}}</span>
+                  <span class="icons" @click="likeComment(comment._id,-1,index)" v-if="likedComments.indexOf(comment._id) >= 0"><img src="../../static/img/liked.png"/>{{comment.likeCount}}</span>
                   <span class="icons" @click="showComments(comment._id)"><img src="../../static/img/comment.png"/>{{comment.commentCount}}</span>
-<!--                  <span><img class="icons" src="../../static/img/liked.png"/></span>-->
+                  <!--                  <span><img class="icons" src="../../static/img/liked.png"/></span>-->
                   <span class="post-info" id="comment-time">{{comment.createdTime}}</span>
                 </div>
               </el-main>
@@ -61,7 +60,7 @@
         </el-container>
       </div>
     </el-col>
-    <el-dialog  v-if='showCommentsDialog' style="margin-top: -50px" title="comments" :destroy-on-close=true :visible.sync="showCommentsDialog" width="600px" :lock-scroll="true">
+    <el-dialog @close="loadDetail($route.params.id)" v-if='showCommentsDialog' style="margin-top: -50px" title="comments" :destroy-on-close=true :visible.sync="showCommentsDialog" width="600px" :lock-scroll="true">
       <ShowComments  ref="showComments" v-bind:commentId="selectedCommentId"></ShowComments>
     </el-dialog>
   </el-row>
@@ -88,11 +87,15 @@ export default {
       time: '',
       isPoster: false,
       showCommentsDialog: false,
-      selectedCommentId: ''
+      selectedCommentId: '',
+      likedComments: []
     }
   },
   created () {
     this.loadDetail(this.$route.params.id)
+    if (this.$store.state.isUserLogin) {
+      this.likedComments = this.$store.state.user.likedComments
+    }
   },
   methods: {
     loadDetail (id) {
@@ -178,10 +181,10 @@ export default {
     async showComments (id) {
       this.selectedCommentId = id
       this.showCommentsDialog = true
+    },
+    async likeComment (id, type, index) {
+      this.$likeComment(id, type, index)
     }
-  },
-  likeComment (id) {
-
   }
 }
 </script>
@@ -281,6 +284,10 @@ export default {
 <style>
   /* global styles */
   .el-scrollbar .el-scrollbar__wrap {
+    overflow: visible;
     overflow-x: hidden !important;
+  }
+  .el-dialog .el-dialog__body {
+    padding-right: 5px !important;
   }
 </style>
