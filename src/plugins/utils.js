@@ -11,8 +11,6 @@ export default {
     }
     Vue.prototype.$formatTimeDay = function (objects) {
       for (var i = 0; i < objects.length; i++) {
-        // objects[i].createdTime = moment(objects[i].createdTime).startOf('day').fromNow()
-        // objects[i].createdTime = moment(objects[i].createdTime).startOf('hour').fromNow()
         let now = moment(new Date())
         let create = moment(objects[i].createdTime)
         let du = moment.duration(now - create)
@@ -20,7 +18,7 @@ export default {
       }
       return objects
     }
-    Vue.prototype.$likeComment = async function (id, type, index) {
+    Vue.prototype.$likeComment = async function (comment, type, index) {
       if (!this.$store.state.isUserLogin) {
         this.$message.warning({
           message: 'Please login',
@@ -28,7 +26,9 @@ export default {
         })
       } else {
         CommentService.likeComment({
-          commentId: id,
+          commentId: comment._id,
+          receiverId: comment.creatorId,
+          content: comment.content,
           userId: this.$store.state.user._id,
           type: type
         }).then(response => {

@@ -52,7 +52,7 @@
         </div>
         <div v-if="!isSelf">
           <el-button type="primary">Follow</el-button>
-          <el-button type="primary">Message</el-button>
+          <el-button type="primary" @click="showMessageDialog">Message</el-button>
         </div>
         <div v-else>
           <el-button style="margin-left: 30%" type="plain" @click="edit">Edit profile</el-button>
@@ -186,6 +186,9 @@ export default {
           this.showComments = true
           break
       }
+    },
+    showMessageDialog () {
+      this.$store.dispatch('setMessageDialogVisible', true)
     }
   },
   components: {

@@ -29,8 +29,8 @@
                 </div>
                 <p>{{comment.content}}</p>
                 <div>
-                  <span class="icons" @click="likeComment(comment._id,1,index)" v-if="likedComments.indexOf(comment._id) < 0"><img src="../../static/img/like.png"/>{{comment.likeCount}}</span>
-                  <span class="icons" @click="likeComment(comment._id,-1,index)" v-if="likedComments.indexOf(comment._id) >= 0"><img src="../../static/img/liked.png"/>{{comment.likeCount}}</span>
+                  <span class="icons" @click="likeComment(comment,1,index)" v-if="likedComments.indexOf(comment._id) < 0"><img src="../../static/img/like.png"/>{{comment.likeCount}}</span>
+                  <span class="icons" @click="likeComment(comment,-1,index)" v-if="likedComments.indexOf(comment._id) >= 0"><img src="../../static/img/liked.png"/>{{comment.likeCount}}</span>
                   <span class="icons" @click="showComments(comment._id)"><img src="../../static/img/comment.png"/>{{comment.commentCount}}</span>
                   <!--                  <span><img class="icons" src="../../static/img/liked.png"/></span>-->
                   <span class="post-info" id="comment-time">{{comment.createdTime}}</span>
@@ -129,7 +129,10 @@ export default {
             type: 0,
             parentId: this.post._id,
             content: this.comment,
-            creatorId: this.$store.state.user._id
+            creatorId: this.$store.state.user._id,
+            receiverId: this.post.author._id,
+            senderId: this.$store.state.user._id,
+            senderName: this.$store.state.user.username
           })
           if (response.data.code === 0) {
             this.error = response.data.msg
@@ -182,8 +185,8 @@ export default {
       this.selectedCommentId = id
       this.showCommentsDialog = true
     },
-    async likeComment (id, type, index) {
-      this.$likeComment(id, type, index)
+    async likeComment (comment, type, index) {
+      this.$likeComment(comment, type, index)
     }
   }
 }

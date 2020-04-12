@@ -7,7 +7,8 @@ const store = new Vuex.Store({
   state: {
     token: '',
     user: null,
-    isUserLogin: false
+    isUserLogin: false,
+    messageDialogVisible: false
   },
   mutations: {
     setToken (state, token) {
@@ -20,6 +21,9 @@ const store = new Vuex.Store({
     },
     setUser (state, user) {
       state.user = user
+    },
+    setMessageDialogVisible (state, flag) {
+      state.messageDialogVisible = flag
     }
   },
   actions: {
@@ -31,6 +35,9 @@ const store = new Vuex.Store({
     },
     setLoadingInstance ({ commit }, loadingInstance) {
       commit('setLoadingInstance', loadingInstance)
+    },
+    setMessageDialogVisible ({ commit }, flag) {
+      commit('setMessageDialogVisible', flag)
     }
   }
 })

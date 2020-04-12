@@ -18,11 +18,11 @@
               <p id="content" style="color: black">{{comment.content}}</p><br/>
               <span style="display:none">{{flag}}</span>
               <div style="margin-top: 15px;margin-left: 38px">
-                <span class="icons" @click="likeComment(comment._id,1,index)" v-if="likedComments.indexOf(comment._id) < 0"><img src="../static/img/like.png"/>{{comment.likeCount}}</span>
-                <span class="icons" @click="likeComment(comment._id,-1,index)" v-if="likedComments.indexOf(comment._id) >= 0"><img src="../static/img/liked.png"/>{{comment.likeCount}}</span>
+                <span class="icons" @click="likeComment(comment,1,index)" v-if="likedComments.indexOf(comment._id) < 0"><img src="../static/img/like.png"/>{{comment.likeCount}}</span>
+                <span class="icons" @click="likeComment(comment,-1,index)" v-if="likedComments.indexOf(comment._id) >= 0"><img src="../static/img/liked.png"/>{{comment.likeCount}}</span>
                 <!--                  <span><img class="icons" src="../../static/img/liked.png"/></span>-->
-                <span class="icons" v-if="!showArray[index]&&isShowReply[index]" @click="showInputArea(index)"><img class="reply" src="../static/img/reply3.png">reply</span>
-                <span class="icons" v-if="showArray[index]" @click="hideInputArea(index)"><img class="reply" src="../static/img/reply3.png">cancel reply</span>
+                <span class="icons" v-if="!showArray[index]&&isShowReply[index]" @click="showInputArea(index)"><img class="reply" src="../static/img/reply.png">reply</span>
+                <span class="icons" v-if="showArray[index]" @click="hideInputArea(index)"><img class="reply" src="../static/img/reply.png">cancel reply</span>
 <!--                <span class="icons" v-if="showArray[index]" @click="hideInputArea(index)"><i class="el-icon-position">cancel reply</i></span>-->
               </div>
               <div class="replyArea" v-if="showArray[index]">
@@ -166,8 +166,8 @@ export default {
       this.isShowReply[index] = false
       this.flag = !this.flag
     },
-    async likeComment (id, type, index) {
-      await this.$likeComment(id, type, index)
+    async likeComment (comment, type, index) {
+      await this.$likeComment(comment, type, index)
     }
   },
   props: {
