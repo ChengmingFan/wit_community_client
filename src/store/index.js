@@ -8,7 +8,8 @@ const store = new Vuex.Store({
     token: '',
     user: null,
     isUserLogin: false,
-    messageDialogVisible: false
+    messageDialogVisible: false,
+    receiver: null
   },
   mutations: {
     setToken (state, token) {
@@ -22,8 +23,8 @@ const store = new Vuex.Store({
     setUser (state, user) {
       state.user = user
     },
-    setMessageDialogVisible (state, flag) {
-      state.messageDialogVisible = flag
+    setReceiver (state, receiver) {
+      state.receiver = receiver
     }
   },
   actions: {
@@ -36,8 +37,8 @@ const store = new Vuex.Store({
     setLoadingInstance ({ commit }, loadingInstance) {
       commit('setLoadingInstance', loadingInstance)
     },
-    setMessageDialogVisible ({ commit }, flag) {
-      commit('setMessageDialogVisible', flag)
+    setReceiver ({ commit }, receiver) {
+      commit('setReceiver', receiver)
     }
   }
 })

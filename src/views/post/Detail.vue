@@ -31,7 +31,7 @@
                 <div>
                   <span class="icons" @click="likeComment(comment,1,index)" v-if="likedComments.indexOf(comment._id) < 0"><img src="../../static/img/like.png"/>{{comment.likeCount}}</span>
                   <span class="icons" @click="likeComment(comment,-1,index)" v-if="likedComments.indexOf(comment._id) >= 0"><img src="../../static/img/liked.png"/>{{comment.likeCount}}</span>
-                  <span class="icons" @click="showComments(comment._id)"><img src="../../static/img/comment.png"/>{{comment.commentCount}}</span>
+                  <span class="icons" @click="showComments(comment._id,comment.creatorId)"><img src="../../static/img/comment.png"/>{{comment.commentCount}}</span>
                   <!--                  <span><img class="icons" src="../../static/img/liked.png"/></span>-->
                   <span class="post-info" id="comment-time">{{comment.createdTime}}</span>
                 </div>
@@ -61,7 +61,7 @@
       </div>
     </el-col>
     <el-dialog @close="loadDetail($route.params.id)" v-if='showCommentsDialog' style="margin-top: -50px" title="comments" :destroy-on-close=true :visible.sync="showCommentsDialog" width="600px" :lock-scroll="true">
-      <ShowComments  ref="showComments" v-bind:commentId="selectedCommentId"></ShowComments>
+      <ShowComments  ref="showComments" v-bind:commentId="selectedComment" v-bind:postId = "this.$route.params.id" v-bind:commentCreator="selectedCommentCreator"></ShowComments>
     </el-dialog>
   </el-row>
 </template>
@@ -87,7 +87,8 @@ export default {
       time: '',
       isPoster: false,
       showCommentsDialog: false,
-      selectedCommentId: '',
+      selectedComment: '',
+      selectedCommentCreator: '',
       likedComments: []
     }
   },
@@ -131,7 +132,6 @@ export default {
             content: this.comment,
             creatorId: this.$store.state.user._id,
             receiverId: this.post.author._id,
-            senderId: this.$store.state.user._id,
             senderName: this.$store.state.user.username
           })
           if (response.data.code === 0) {
@@ -181,8 +181,9 @@ export default {
         })
       })
     },
-    async showComments (id) {
-      this.selectedCommentId = id
+    async showComments (id, userId) {
+      this.selectedComment = id
+      this.selectedCommentCreator = userId
       this.showCommentsDialog = true
     },
     async likeComment (comment, type, index) {

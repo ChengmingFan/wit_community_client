@@ -188,7 +188,7 @@ export default {
       }
     },
     showMessageDialog () {
-      this.$store.dispatch('setMessageDialogVisible', true)
+      this.$store.dispatch('setReceiver', this.user)
     }
   },
   components: {

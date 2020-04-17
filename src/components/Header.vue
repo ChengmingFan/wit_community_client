@@ -23,18 +23,17 @@
                 <i class="el-icon-bell" style="font-size: 25px"></i>
                 <el-badge v-show="notificationNum !== 0" class="mark" :value="notificationNum"/>
                 <el-popover ref="notification" placement="bottom" width="200" trigger="click">
-                  <ul style="list-style: none;padding-left: 0;margin-top: -5px;height: 200px;margin-bottom: 5px">
+                  <ul style="list-style: none;padding-left: 0;height: 200px;margin: -5px -10px 5px;">
                     <el-scrollbar ref="myScrollbar" style="width: 100%;height: 100%">
-                      <li v-if="notificationNum === 0"><div
+                      <li v-if="notificationList.length === 0"><div
                         style="width: 150px;height: 100px;margin-left: 50px;margin-top: 50px">No Notifications</div></li>
-                     <li v-else v-for="notification in notificationList" v-bind:key="notification._id">
-                       <div v-bind:class="{read: notification.status == 1,unread: notification.status === 0}">
-                          <a
-                            @click="$router.push('/user/profile/' + notification.senderId)">{{notification.senderName}} </a>
-                         <span v-if="notification.type === 1">liked your comment </span>
-                         <span v-else-if="notification.type === 2">commented your post </span>
-                         <span v-else>replied your comment </span>
-                         <a @click="getDetail(notification.parentId)">{{notification.content}}</a>
+                     <li v-else v-for="notification in notificationList" v-bind:key="notification._id" style="margin-right: 5px">
+                       <div v-bind:class="{read: notification.status === 1,unread: notification.status === 0}" style="width: 210px">
+                         <router-link target="_blank" :to="{path:'/user/profile/' + notification.senderId}">{{notification.senderName}}</router-link>
+                         <span v-if="notification.type === 1"> liked your comment: </span>
+                         <span v-else-if="notification.type === 2"> commented your post: </span>
+                         <span v-else> replied your comment: </span>
+                         <div class="notification-content"  @click="getDetail(notification.postId,notification._id)">{{notification.content}}</div>
                        </div>
                       </li>
                     </el-scrollbar>
@@ -43,34 +42,42 @@
                     @click="markRead">Mark Read</el-button></span>
                 </el-popover>
               </span>
-              <span class="header_icons" v-show="fullWidth" v-popover:message>
+              <span class="header_icons" v-show="fullWidth" v-popover:message @click="showMessenger">
                 <i class="el-icon-message" style="font-size: 25px"></i>
                 <el-badge v-show="messageNum !== 0" class="mark" :value="messageNum"/>
-                <el-popover ref="message" placement="bottom" width="200" trigger="click" style="display: none">
-                       <ul style="list-style: none;padding-left: 0;margin-top: -5px;height: 200px;margin-bottom: 5px">
+                <el-popover ref="message" placement="bottom" width="200" trigger="click">
+                  <ul
+                    style="list-style: none;padding-left: 0;margin-top: -5px;height: 200px;margin-bottom: 5px;margin-right: -10px">
                     <el-scrollbar ref="myScrollbar" style="width: 100%;height: 100%">
-                      <li v-if="messageNum === 0"><div
+                      <li v-if="messengerList.length === 0"><div
                         style="width: 150px;height: 100px;margin-left: 50px;margin-top: 50px">No Messages</div></li>
-<!--                     <li v-else v-for="notification in notificationList" v-bind:key="notification._id">-->
-<!--                       <div v-bind:class="{read: notification.status == 1,unread: notification.status === 0}">-->
-<!--                          <a-->
-<!--                            @click="$router.push('/user/profile/' + notification.senderId)">{{notification.senderName}} </a>-->
-<!--                         <span v-if="notification.type === 1">liked your comment </span>-->
-<!--                         <span v-else-if="notification.type === 2">commented your post </span>-->
-<!--                         <span v-else>replied your comment </span>-->
-<!--                         <a @click="getDetail(notification.parentId)">{{notification.content}}</a>-->
-<!--                       </div>-->
-<!--                      </li>-->
+                     <li v-else v-for="messenger in messengerList" v-bind:key="messenger._id.senderId"
+                         style="margin-right: 9px;cursor: pointer"
+                         @click="showMessageDialog(messenger.userId,messenger.username,messenger.unreadNum)">
+                         <div
+                           v-bind:class="{read: messenger.lastModifiedBy === user.username || messenger.unreadNum === 0,unread: messenger.lastModifiedBy !== user.username && messenger.unreadNum != 0}"
+                           style="display: flex">
+                           <el-avatar v-if="messenger.userAvatar" class="user_avatar" :size="50" shape="square"
+                                      fit="fit" :src="messenger.userAvatar"> </el-avatar>
+                           <el-avatar v-else class="user_avatar" :size="50" shape="square" fit="fit"> {{messenger.username}} </el-avatar>
+                           <div style="float: right;margin-left: 5px;width: 100px">
+                             <span style="font-weight: bold">{{messenger.username}}</span><br/>
+                             <div class="message-content">{{messenger.content}}</div>
+                           </div>
+                           <el-badge v-show="messenger.unreadNum !== 0" style="margin-top: 17px;margin-left: 10px"
+                                     :value="messenger.unreadNum"/>
+                       </div>
+                      </li>
                     </el-scrollbar>
                   </ul>
                 </el-popover>
               </span>
               <el-dropdown>
                       <span class="el-dropdown-link" style="font-size: 20px;">
-                        {{$store.state.user.username}}<i class="el-icon-arrow-down el-icon--right"></i>
+                        {{user.username}}<i class="el-icon-arrow-down el-icon--right"></i>
                       </span>
                 <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item><span @click="$router.push('/user/profile/' + $store.state.user._id)">Profile</span>
+                  <el-dropdown-item><span @click="$router.push('/user/profile/' + user._id)">Profile</span>
                   </el-dropdown-item>
                   <el-dropdown-item><span @click="logout">Logout</span></el-dropdown-item>
                 </el-dropdown-menu>
@@ -78,16 +85,17 @@
             </div>
           </template>
         </div>
-        <el-dialog :before-close="close" :title="dialogTitle" :visible.sync="dialogTableVisible" center
-                   :append-to-body='true' :lock-scroll="false" width="40%">
-          <Login ref="loginDialog" v-show="loginDialogTableVisible" @register="register" v-on:hidden="close"></Login>
-          <Register ref="registerDialog" v-show="registerDialogTableVisible" v-on:login="login"></Register>
-        </el-dialog>
-        <el-dialog @close="closeMessageDialog" title="Message" :visible.sync="messageDialogVisible" center :append-to-body="true" :destroy-on-close=true :lock-scroll="true" width="40%" style="margin-top: -70px">
-          <Chat></Chat>
-        </el-dialog>
       </div>
     </el-col>
+    <el-dialog :before-close="close" :title="dialogTitle" :visible.sync="dialogTableVisible" center
+               :append-to-body='true' :lock-scroll="false" width="40%">
+      <Login ref="loginDialog" v-show="loginDialogTableVisible" @register="register" v-on:hidden="close"></Login>
+      <Register ref="registerDialog" v-show="registerDialogTableVisible" v-on:login="login"></Register>
+    </el-dialog>
+    <el-dialog @close="closeMessageDialog" title="Message" :visible.sync="messageDialogVisible" center
+               :append-to-body="true" :destroy-on-close=true :lock-scroll="true" width="40%" style="margin-top: -70px">
+      <Chat></Chat>
+    </el-dialog>
   </el-row>
 </template>
 
@@ -95,10 +103,12 @@
 import Register from './Register'
 import Login from './Login'
 import NotificationService from '../services/NotificationService'
+import MessageService from '../services/MessageService'
 import Chat from './Chat'
 
 export default {
   // todo:通知栏跳转到对应的位置
+  // todo: 主页查看帖子和评论显示不全
   name: 'header',
   props: ['fullWidth'],
   data () {
@@ -113,6 +123,7 @@ export default {
       notificationNum: 0,
       messageNum: 0,
       notificationList: '',
+      messengerList: '',
       messageDialogVisible: this.$store.state.messageDialogVisible
     }
   },
@@ -133,6 +144,8 @@ export default {
       this.dialogTableVisible = false
       this.$refs.loginDialog.close()
       this.$refs.registerDialog.close()
+      this.getUnreadMessageNum()
+      this.getUnreadNotificationNum()
     },
     logout () {
       this.$store.dispatch('setToken', '')
@@ -151,13 +164,19 @@ export default {
       this.keywords = ''
     },
     async getUnreadNotificationNum () {
-      const response = await NotificationService.getUnreadNum(this.$store.state.user._id)
+      const response = await NotificationService.getUnreadNum(this.user._id)
       if (response.data.code === 1) {
         this.notificationNum = response.data.unreadNotificationNum
       }
     },
+    async getUnreadMessageNum () {
+      const response = await MessageService.getUnreadNum(this.user._id)
+      if (response.data.code === 1) {
+        this.messageNum = response.data.unreadMessageNum
+      }
+    },
     async showNotification () {
-      NotificationService.getNotifications(this.$store.state.user._id)
+      NotificationService.getNotifications(this.user._id)
         .then(response => {
           if (response.data.code === 0) {
             this.$message.error({
@@ -169,16 +188,37 @@ export default {
           }
         })
     },
-    getDetail (id) {
-      this.$router.push({
-        name: 'post-detail',
-        params: {
-          id: id
-        }
-      })
+    showMessenger () {
+      MessageService.getMessengerList(this.user.username)
+        .then(res => {
+          if (res.data.code === 0) {
+            this.$message.error({
+              message: 'error',
+              center: true
+            })
+          } else {
+            this.messengerList = res.data.messenger
+          }
+        })
+    },
+    getDetail (postId, notificationId) {
+      NotificationService.markOneRead(notificationId)
+        .then(res => {
+          if (res.data.code === 1) {
+            this.notificationNum = this.notificationNum - 1
+            this.showNotification()
+            let routeUrl = this.$router.resolve({
+              name: 'post-detail',
+              params: {
+                id: postId
+              }
+            })
+            window.open(routeUrl.href, '_blank')
+          }
+        })
     },
     async markRead () {
-      NotificationService.markRead(this.$store.state.user._id)
+      NotificationService.markAllRead(this.user._id)
         .then(response => {
           console.log(response.data)
           if (response.data.code === 1) {
@@ -188,8 +228,25 @@ export default {
         })
     },
     closeMessageDialog () {
-      this.$store.dispatch('setMessageDialogVisible', false)
+      // this.$store.dispatch('setMessageDialogVisible', false)
+      this.$store.dispatch('setReceiver', null)
       this.messageDialogVisible = false
+    },
+    async showMessageDialog (id, name, unreadNum) {
+      let receiver = {
+        _id: id,
+        username: name
+      }
+      this.$store.dispatch('setReceiver', receiver)
+      await MessageService.markRead({
+        userId: this.user._id,
+        senderId: id
+      }).then(res => {
+        if (res.data.code === 1) {
+          this.showMessenger()
+          this.messageNum = this.messageNum - unreadNum
+        }
+      })
     }
   },
   components: {
@@ -200,17 +257,20 @@ export default {
   created () {
     if (this.$store.state.isUserLogin) {
       this.getUnreadNotificationNum()
+      this.getUnreadMessageNum()
     }
   },
   computed: {
     messageDialog () {
-      return this.$store.state.messageDialogVisible
+      return this.$store.state.receiver
+    },
+    user () {
+      return this.$store.state.user
     }
   },
   watch: {
     messageDialog: function (val, oldval) {
-      this.messageDialogVisible = val
-      console.log(this.messageDialogVisible)
+      this.messageDialogVisible = val !== null
     }
   }
 }
@@ -272,7 +332,8 @@ export default {
 
   .read {
     padding: 10px 5px;
-    margin-top: 5px
+    margin-top: 5px;
+    width: 200px;
   }
 
   .read:hover {
@@ -282,7 +343,26 @@ export default {
   .unread {
     background-color: #f6f6f6;
     padding: 10px 5px;
-    margin-top: 5px
+    margin-top: 5px;
+    width: 200px;
+  }
+
+  .message-content {
+    color: gray;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .notification-content {
+    color: #409EFF;;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
   }
 
 </style>

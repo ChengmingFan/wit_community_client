@@ -26,6 +26,7 @@ export default {
         })
       } else {
         CommentService.likeComment({
+          postId: comment.ref === null ? comment.parentId : comment.ref,
           commentId: comment._id,
           receiverId: comment.creatorId,
           content: comment.content,

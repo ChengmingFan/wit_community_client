@@ -91,7 +91,10 @@ export default {
             type: 1,
             parentId: this.commentId,
             content: this.commentContent,
-            creatorId: this.$store.state.user._id
+            senderName: this.$store.state.user.username,
+            creatorId: this.$store.state.user._id,
+            receiverId: this.commentCreator,
+            ref: this.postId
           })
           if (response.data.code === 0) {
             this.error = response.data.msg
@@ -125,7 +128,7 @@ export default {
             parentId: this.commentId,
             content: this.commentContent2,
             creatorId: this.$store.state.user._id,
-            ref: user
+            ref: this.postId
           })
           if (response.data.code === 0) {
             this.error = response.data.msg
@@ -172,6 +175,14 @@ export default {
   },
   props: {
     commentId: {
+      type: String,
+      required: true
+    },
+    postId: {
+      type: String,
+      required: true
+    },
+    commentCreator: {
       type: String,
       required: true
     }

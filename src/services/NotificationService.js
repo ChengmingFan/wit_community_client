@@ -7,7 +7,10 @@ export default {
   getNotifications (id) {
     return Api().get(`/notification/${id}`)
   },
-  markRead (id) {
+  markAllRead (id) {
+    return Api().get(`/notification/markAll/${id}`)
+  },
+  markOneRead (id) {
     return Api().get(`/notification/mark/${id}`)
   }
 }
