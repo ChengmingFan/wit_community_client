@@ -8,10 +8,8 @@
           <div id="tip" v-show="noResult">No related results</div>
           <el-container v-for="post in showList" v-bind:key="post._id">
             <el-aside width="95px">
-              <el-image
-                style="width: 85px; height: 85px;margin-left: 10px"
-                src="http://pic.qqkuyou.com/tximg/mfqgpgqy.jpeg"
-                fit="fit"></el-image>
+              <el-avatar v-if="post.author.avatarUrl" class="user_avatar" :size="85" shape="square" fit="fit" @click.native="$router.push('/user/profile/' + post.author._id)" :src="post.author.avatarUrl"> </el-avatar>
+              <el-avatar v-else class="user_avatar" :size="85" shape="square" fit="fit" @click.native="$router.push('/user/profile/' + post.author._id)"> {{post.author.username}} </el-avatar>
             </el-aside>
             <el-main class="post-body">
               <a class="title" @click="getDetail(post._id)">{{post.title}}</a>
@@ -123,5 +121,9 @@ export default {
     color: gray;
     text-align: center;
     font-size: 30px;
+  }
+  .user_avatar {
+    margin-left: 10px;
+    cursor: pointer;
   }
 </style>

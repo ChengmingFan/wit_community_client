@@ -9,7 +9,8 @@ const store = new Vuex.Store({
     user: null,
     isUserLogin: false,
     messageDialogVisible: false,
-    receiver: null
+    receiver: null,
+    currentSubarea: null
   },
   mutations: {
     setToken (state, token) {
@@ -25,6 +26,9 @@ const store = new Vuex.Store({
     },
     setReceiver (state, receiver) {
       state.receiver = receiver
+    },
+    setCurrentSubarea (state, currentSubarea) {
+      state.currentSubarea = currentSubarea
     }
   },
   actions: {
@@ -39,6 +43,9 @@ const store = new Vuex.Store({
     },
     setReceiver ({ commit }, receiver) {
       commit('setReceiver', receiver)
+    },
+    setCurrentSubarea ({ commit }, currentSubarea) {
+      commit('setCurrentSubarea', currentSubarea)
     }
   }
 })

@@ -1,15 +1,15 @@
 <template>
   <el-row class="main-container">
     <el-col :xs="24" :sm="24" :md="8" :lg="6" :xl="6">
-      <div style="width: 200px">
+      <div style="width: 200px" class="hidden-sm-and-down">
         <el-menu id="sideBar"
                  default-active="1"
                  class="el-menu-vertical-demo">
-          <el-menu-item index="1" @click="loadPopular">
+          <el-menu-item index="1" @click="showSubarea('Popular','popular')">
             <i class="el-icon-thumb"></i>
             <span slot="title">popular</span>
           </el-menu-item>
-          <el-menu-item index="2" @click="loadPosts">
+          <el-menu-item index="2" @click="showSubarea('All','all')">
             <i class="el-icon-view"></i>
             <span slot="title">all post</span>
           </el-menu-item>
@@ -43,8 +43,12 @@
         <div>
           <el-container v-for="post in showPosts" v-bind:key="post._id">
             <el-aside width="95px">
-              <el-avatar v-if="post.author.avatarUrl" class="user_avatar" :size="85" shape="square" fit="fit" @click.native="$router.push('/user/profile/' + post.author._id)" :src="post.author.avatarUrl"> </el-avatar>
-              <el-avatar v-else class="user_avatar" :size="85" shape="square" fit="fit" @click.native="$router.push('/user/profile/' + post.author._id)"> {{post.author.username}} </el-avatar>
+              <el-avatar v-if="post.author.avatarUrl" class="user_avatar" :size="85" shape="square" fit="fit"
+                         @click.native="$router.push('/user/profile/' + post.author._id)"
+                         :src="post.author.avatarUrl"></el-avatar>
+              <el-avatar v-else class="user_avatar" :size="85" shape="square" fit="fit"
+                         @click.native="$router.push('/user/profile/' + post.author._id)"> {{post.author.username}}
+              </el-avatar>
             </el-aside>
             <el-main class="post-body">
               <a class="title" @click="getDetail(post._id)">{{post.title}}</a>
@@ -71,6 +75,7 @@
 
 <script>
 import PostService from '../services/PostService'
+
 let moment = require('moment')
 export default {
   name: 'container',
@@ -86,6 +91,30 @@ export default {
   },
   async created () {
     await this.loadPopular()
+  },
+  computed: {
+    currentSubarea () {
+      return this.$store.state.currentSubarea
+    }
+  },
+  watch: {
+    currentSubarea: function (val, oldval) {
+      this.categoryName = val.name
+      if (val.name === 'All') {
+        this.loadPosts()
+      } else if (val.name === 'Popular') {
+        this.loadPopular()
+      } else {
+        PostService.getSubareaPost(val.key)
+          .then(response => {
+            this.allPosts = response.data.posts
+            this.formatPost()
+          })
+          .catch(error => {
+            this.errors.push(error)
+          })
+      }
+    }
   },
   methods: {
     loadPosts: function () {
@@ -118,15 +147,11 @@ export default {
       })
     },
     showSubarea (name, key) {
-      this.categoryName = name
-      PostService.getSubareaPost(key)
-        .then(response => {
-          this.allPosts = response.data.posts
-          this.formatPost()
-        })
-        .catch(error => {
-          this.errors.push(error)
-        })
+      let subarea = {
+        name: name,
+        key: key
+      }
+      this.$store.dispatch('setCurrentSubarea', subarea)
     },
     loadPopular () {
       PostService.getPopular()
@@ -152,29 +177,32 @@ export default {
 </script>
 
 <style scoped>
-  #sideBar{
+  #sideBar {
     border: transparent;
     margin-left: 8%;
     width: 250px;
     border-radius: 10px;
     margin-right: -50px;
   }
-  #post{
+
+  #post {
     /*margin-top: 20px;*/
     height: 610px;
-    width: 820px;
+    width: 100%;
     background: white;
     border-radius: 10px;
     margin-right: 8%;
   }
-  #subareaTitle{
-    color:lightgray ;
+
+  #subareaTitle {
+    color: lightgray;
     margin-top: 0px;
     padding-top: 10px;
     padding-left: 10px;
     margin-bottom: 0;
   }
-  .el-divider{
+
+  .el-divider {
     margin-top: 10px;
   }
 
@@ -215,7 +243,7 @@ export default {
     margin-bottom: 0px;
   }
 
-  .user_avatar{
+  .user_avatar {
     margin-left: 10px;
     cursor: pointer;
   }

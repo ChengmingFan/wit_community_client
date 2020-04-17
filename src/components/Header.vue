@@ -2,8 +2,10 @@
   <el-row>
     <el-col>
       <div id="top">
+        <span v-show="showMenu" @click="openDrawer" style="margin-left: -15px;margin-top: 2px" class="hidden-md-and-up"><img
+          src="../static/img/menu.png" style="width: 30px;height: 30px"></span>
         <p @click=toIndex>WIT Community</p>
-        <el-input id="search" style="width: 20%;margin-left: auto;margin-right: auto" v-model="keywords"
+        <el-input id="search" style="width: 20%;margin-left: 28%;margin-right: auto" v-model="keywords"
                   placeholder="search post here ..." @keyup.enter.native="onEnterSearch" v-show="fullWidth">
           <i slot="prefix" class="el-input__icon el-icon-search" style="margin-left: 0px"></i>
         </el-input>
@@ -13,7 +15,7 @@
             <span @click="register">Sign up</span>
           </template>
           <template v-else>
-            <div style="position: fixed;right: 20px;top:10px; text-align: center;margin-top: 0">
+            <div style="position: fixed;right: 20px;top:10px; text-align: center;margin-top: 0;">
               <span class="header_icons" @click="$router.push('/post/create')" style="margin-right: 10px"
                     v-show="fullWidth">
                 <i style="font-size: 25px" class="el-icon-edit-outline"></i>
@@ -27,13 +29,15 @@
                     <el-scrollbar ref="myScrollbar" style="width: 100%;height: 100%">
                       <li v-if="notificationList.length === 0"><div
                         style="width: 150px;height: 100px;margin-left: 50px;margin-top: 50px">No Notifications</div></li>
-                     <li v-else v-for="notification in notificationList" v-bind:key="notification._id" style="margin-right: 5px">
-                       <div v-bind:class="{read: notification.status === 1,unread: notification.status === 0}" style="width: 210px">
+                     <li v-else v-for="notification in notificationList" v-bind:key="notification._id"
+                         style="margin-right: 5px">
+                       <div v-bind:class="{read: notification.status === 1,unread: notification.status === 0}"
+                            style="width: 210px">
                          <router-link target="_blank" :to="{path:'/user/profile/' + notification.senderId}">{{notification.senderName}}</router-link>
                          <span v-if="notification.type === 1"> liked your comment: </span>
                          <span v-else-if="notification.type === 2"> commented your post: </span>
                          <span v-else> replied your comment: </span>
-                         <div class="notification-content"  @click="getDetail(notification.postId,notification._id)">{{notification.content}}</div>
+                         <div class="notification-content" @click="getDetail(notification.postId,notification._id)">{{notification.content}}</div>
                        </div>
                       </li>
                     </el-scrollbar>
@@ -96,6 +100,45 @@
                :append-to-body="true" :destroy-on-close=true :lock-scroll="true" width="40%" style="margin-top: -70px">
       <Chat></Chat>
     </el-dialog>
+    <el-drawer
+      title="SUBAREA"
+      :visible.sync="drawer"
+      direction="ltr">
+      <div>
+        <el-menu id="sideBar"
+                 default-active="1"
+                 class="el-menu-vertical-demo">
+          <el-menu-item index="1" @click="showSubarea('Popular','popular')">
+            <i class="el-icon-thumb"></i>
+            <span slot="title">popular</span>
+          </el-menu-item>
+          <el-menu-item index="2" @click="showSubarea('All','all')">
+            <i class="el-icon-view"></i>
+            <span slot="title">all post</span>
+          </el-menu-item>
+          <el-menu-item index="3" @click="showSubarea('Accommodation','accommodation')">
+            <i class="el-icon-house"></i>
+            <span slot="title">accommodation</span>
+          </el-menu-item>
+          <el-menu-item index="4" @click="showSubarea('Sale','sale')">
+            <i class="el-icon-shopping-cart-2"></i>
+            <span slot="title">sale</span>
+          </el-menu-item>
+          <el-menu-item index="5" @click="showSubarea('Activity','activity')">
+            <i class="el-icon-time"></i>
+            <span slot="title">activity</span>
+          </el-menu-item>
+          <el-menu-item index="6" @click="showSubarea('Study','study')">
+            <i class="el-icon-notebook-2"></i>
+            <span slot="title">study</span>
+          </el-menu-item>
+          <el-menu-item index="7" @click="showSubarea('Other','other')">
+            <i class="el-icon-more-outline"></i>
+            <span slot="title">other</span>
+          </el-menu-item>
+        </el-menu>
+      </div>
+    </el-drawer>
   </el-row>
 </template>
 
@@ -107,7 +150,6 @@ import MessageService from '../services/MessageService'
 import Chat from './Chat'
 
 export default {
-  // todo:通知栏跳转到对应的位置
   // todo: 主页查看帖子和评论显示不全
   name: 'header',
   props: ['fullWidth'],
@@ -124,7 +166,9 @@ export default {
       messageNum: 0,
       notificationList: '',
       messengerList: '',
-      messageDialogVisible: this.$store.state.messageDialogVisible
+      messageDialogVisible: this.$store.state.messageDialogVisible,
+      drawer: false,
+      showMenu: false
     }
   },
   methods: {
@@ -247,6 +291,17 @@ export default {
           this.messageNum = this.messageNum - unreadNum
         }
       })
+    },
+    openDrawer () {
+      this.drawer = !this.drawer
+    },
+    showSubarea (name, key) {
+      let subarea = {
+        name: name,
+        key: key
+      }
+      this.$store.dispatch('setCurrentSubarea', subarea)
+      this.drawer = false
     }
   },
   components: {
@@ -259,6 +314,9 @@ export default {
       this.getUnreadNotificationNum()
       this.getUnreadMessageNum()
     }
+    if (this.currentPath === '/') {
+      this.showMenu = true
+    }
   },
   computed: {
     messageDialog () {
@@ -266,11 +324,17 @@ export default {
     },
     user () {
       return this.$store.state.user
+    },
+    currentPath () {
+      return this.$route.path
     }
   },
   watch: {
     messageDialog: function (val, oldval) {
       this.messageDialogVisible = val !== null
+    },
+    currentPath (val, oldval) {
+      this.showMenu = val === '/'
     }
   }
 }
@@ -355,6 +419,7 @@ export default {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
   }
+
   .notification-content {
     color: #409EFF;;
     cursor: pointer;

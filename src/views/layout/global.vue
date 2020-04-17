@@ -25,7 +25,7 @@ export default {
   methods: {
     page_width () {
       let screenWidth = document.body.clientWidth
-      if (screenWidth < 800) {
+      if (screenWidth < 850) {
         this.fullWidth = false
       } else {
         this.fullWidth = true
