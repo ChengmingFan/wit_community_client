@@ -91,7 +91,6 @@ export default {
     },
     OnGoogleAuthSuccess (idToken) {
       let googleUser = jsonwebtoken.decode(idToken)
-      console.log(googleUser)
       let user = {
         username: googleUser.name,
         email: googleUser.email,

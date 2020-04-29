@@ -53,8 +53,7 @@
           </div>
           <div v-loading="quillUpdateImg" class="comment-input" style="height: 300px">
             <quill-editor ref="myTextEditor" v-model="comment" :options="editorOption"
-                          style="height:200px;"></quill-editor>
-            <!--            <el-input ref="comment" type="textarea" :rows="4" placeholder="comment here" v-model="comment"></el-input>-->
+                          ></quill-editor>
             <el-button id="btn-comment" type="primary" @click="submitComment">comment</el-button>
           </div>
         </div>
@@ -367,7 +366,7 @@ export default {
   }
 
   #btn-comment {
-    margin-top: 80px;
+    margin-top: 10px;
     margin-bottom: 10px;
     /*margin-left: 10px;*/
     float: right;
@@ -408,6 +407,7 @@ export default {
   .el-dialog {
     height: 642px;
   }
+
 </style>
 <style>
   /* global styles */
@@ -418,5 +418,9 @@ export default {
 
   .el-dialog .el-dialog__body {
     padding-right: 5px !important;
+  }
+
+  .ql-editor{
+    height:180px;
   }
 </style>

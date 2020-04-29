@@ -263,7 +263,6 @@ export default {
     async markRead () {
       NotificationService.markAllRead(this.user._id)
         .then(response => {
-          console.log(response.data)
           if (response.data.code === 1) {
             this.notificationNum = 0
             this.showNotification()
