@@ -78,7 +78,7 @@ export default {
               this.$store.dispatch('setToken', response.data.token)
               this.$store.dispatch('setUser', response.data.user)
               this.hidden()
-              this.$router.push('/')
+              // location.reload()
             }
           } catch (e) {
             this.$message.error('Failed to log in. Please retry later')
@@ -91,15 +91,19 @@ export default {
     },
     OnGoogleAuthSuccess (idToken) {
       let googleUser = jsonwebtoken.decode(idToken)
+      console.log(googleUser)
       let user = {
         username: googleUser.name,
         email: googleUser.email,
-        _id: googleUser.sub
+        gid: googleUser.sub
       }
-      this.$store.dispatch('setToken', idToken)
-      this.$store.dispatch('setUser', user)
+      UserService.getUserByGid(user)
+        .then(res => {
+          this.$store.dispatch('setToken', res.data.token)
+          this.$store.dispatch('setUser', res.data.user)
+        })
       this.hidden()
-      this.$router.push('/post/list')
+      // this.$router.push('/post/list')
     },
     OnGoogleAuthFail (error) {
       this.$message.error('Failed to log in. Please retry later' + error)

@@ -1,7 +1,7 @@
 <template>
   <el-container>
     <el-header class="header" height="50px">
-      <Header :fullWidth="fullWidth"></Header>
+      <v-header :fullWidth="fullWidth"></v-header>
     </el-header>
     <el-main id="container">
       <router-view></router-view>
@@ -20,7 +20,7 @@ export default {
   },
   name: 'Home',
   components: {
-    Header
+    'v-header': Header
   },
   methods: {
     page_width () {

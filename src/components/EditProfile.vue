@@ -8,7 +8,7 @@
                        :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :auto-upload="true">
               <div style="display: flex;width: 200px;margin-left: 90px">
                 <el-avatar v-if="editForm.avatarUrl"  class="avatar" shape="square" :size="80" fit="fill" :src="editForm.avatarUrl"></el-avatar>
-                <el-avatar v-else  class="avatar" shape="square" :size="80" fit="fill">123</el-avatar>
+                <el-avatar v-else  class="avatar" shape="square" :size="80" fit="fill">{{editForm.username}}</el-avatar>
                 <i class="el-icon-camera" style="font-size: 31px;margin-left: -30px;margin-top: 52px;"/>
 <!--                <i class="el-icon-plus avatar-uploader-icon"></i>-->
               </div>

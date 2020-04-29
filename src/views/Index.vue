@@ -76,7 +76,6 @@
 <script>
 import PostService from '../services/PostService'
 
-let moment = require('moment')
 export default {
   name: 'container',
   data () {
@@ -107,8 +106,9 @@ export default {
       } else {
         PostService.getSubareaPost(val.key)
           .then(response => {
-            this.allPosts = response.data.posts
-            this.formatPost()
+            this.allPosts = this.$formatTimeYear(response.data.posts)
+            this.showPosts = this.allPosts.splice(0, 4)
+            this.total = this.allPosts.length
           })
           .catch(error => {
             this.errors.push(error)
@@ -121,8 +121,9 @@ export default {
       PostService.getAllPost()
         .then(response => {
           this.categoryName = 'All'
-          this.allPosts = response.data.posts
-          this.formatPost()
+          this.allPosts = this.$formatTimeYear(response.data.posts)
+          this.showPosts = this.allPosts.slice(0, 4)
+          this.total = this.allPosts.length
         })
         .catch(error => {
           this.errors.push(error)
@@ -133,10 +134,8 @@ export default {
       var start = (this.page - 1) * this.pagesize
       var end = this.page * this.pagesize
       var showPosts = this.allPosts.slice(start, end)
-      for (var i = 0; i < showPosts.length; i++) {
-        showPosts[i].createdTime = moment(showPosts[i].createdTime).format('YYYY-MM-DD HH:mm')
-      }
-      this.showPosts = showPosts
+      this.showPosts = this.$formatTimeYear(showPosts)
+      this.total = this.allPosts.length
     },
     getDetail (id) {
       this.$router.push({
@@ -157,20 +156,13 @@ export default {
       PostService.getPopular()
         .then(response => {
           this.categoryName = 'Popular'
-          this.allPosts = response.data.posts
-          this.formatPost()
+          this.allPosts = this.$formatTimeYear(response.data.posts)
+          this.showPosts = this.allPosts.slice(0, 4)
+          this.total = this.allPosts.length
         })
         .catch(error => {
           this.errors.push(error)
         })
-    },
-    formatPost () {
-      var showPosts = this.allPosts.slice(0, 4)
-      for (var i = 0; i < showPosts.length; i++) {
-        showPosts[i].createdTime = moment(showPosts[i].createdTime).format('YYYY-MM-DD HH:mm')
-      }
-      this.showPosts = showPosts
-      this.total = this.allPosts.length
     }
   }
 }

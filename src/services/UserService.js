@@ -22,5 +22,8 @@ export default {
   },
   getCommentsByUserId (id) {
     return Api().get(`/comment/user/${id}`)
+  },
+  getUserByGid (data) {
+    return Api().post(`/user/gid/`, data)
   }
 }

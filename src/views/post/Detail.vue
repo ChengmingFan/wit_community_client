@@ -6,7 +6,9 @@
         <div class="post-info">
           <span>Author: {{post.author.username}} | </span>
           <span>Time: {{post.createdTime}} | </span>
-          <span>Views: {{post.viewCount}} </span>
+          <span>Views: {{post.viewCount}} | </span>
+          <span style="color: #409EFF;cursor: pointer" @click="focusComment">Comment</span>
+          <span v-if="post.author._id ===  $store.state.user._id" style="color: #409EFF;cursor: pointer" @click="deletePost"> | Delete</span>
         </div>
         <el-divider/>
         <div>
@@ -19,19 +21,29 @@
           <div v-for="(comment,index) in comments" v-bind:key="comment._id">
             <el-container>
               <el-aside width="auto">
-                <el-avatar v-if="comment.author.avatarUrl" style="cursor: pointer" :size="90" shape="square" fit="fit" @click.native="$router.push('/user/profile/' + comment.creatorId)" :src="comment.author.avatarUrl"> </el-avatar>
-                <el-avatar v-else style="cursor: pointer"  :size="90" shape="square" fit="fit" @click.native="$router.push('/user/profile/' + comment.creatorId)"> {{comment.author.username}} </el-avatar>
+                <el-avatar v-if="comment.author.avatarUrl" style="cursor: pointer" :size="90" shape="square" fit="fit"
+                           @click.native="$router.push('/user/profile/' + comment.creatorId)"
+                           :src="comment.author.avatarUrl"></el-avatar>
+                <el-avatar v-else style="cursor: pointer" :size="90" shape="square" fit="fit"
+                           @click.native="$router.push('/user/profile/' + comment.creatorId)">
+                  {{comment.author.username}}
+                </el-avatar>
               </el-aside>
               <el-main class="comment-body">
                 <div style="display: inline">
                   <a class="username" @click="$router.push('/user/profile/' + comment.creatorId)">{{(comment.author.username)}}</a>
-                  <span v-show="($store.state.isUserLogin && comment.creatorId === $store.state.user._id) || isPoster" id="btn-delete" class="el-icon-close" @click="deleteComment(comment._id)"></span>
+                  <span style="float: right"
+                        v-show="($store.state.isUserLogin && comment.creatorId === $store.state.user._id) || isPoster"
+                        id="btn-delete" class="el-icon-close" @click="deleteComment(comment._id)"></span>
                 </div>
-                <p>{{comment.content}}</p>
+                <div v-html="comment.content"></div>
                 <div>
-                  <span class="icons" @click="likeComment(comment,1,index)" v-if="likedComments.indexOf(comment._id) < 0"><img src="../../static/img/like.png"/>{{comment.likeCount}}</span>
-                  <span class="icons" @click="likeComment(comment,-1,index)" v-if="likedComments.indexOf(comment._id) >= 0"><img src="../../static/img/liked.png"/>{{comment.likeCount}}</span>
-                  <span class="icons" @click="showComments(comment._id,comment.creatorId)"><img src="../../static/img/comment.png"/>{{comment.commentCount}}</span>
+                  <span class="icons" @click="likeComment(comment,1,index)"
+                        v-if="likedComments.indexOf(comment._id) < 0"><img src="../../static/img/like.png"/>{{comment.likeCount}}</span>
+                  <span class="icons" @click="likeComment(comment,-1,index)"
+                        v-if="likedComments.indexOf(comment._id) >= 0"><img src="../../static/img/liked.png"/>{{comment.likeCount}}</span>
+                  <span class="icons" @click="showComments(comment._id,comment.creatorId)"><img
+                    src="../../static/img/comment.png"/>{{comment.commentCount}}</span>
                   <!--                  <span><img class="icons" src="../../static/img/liked.png"/></span>-->
                   <span class="post-info" id="comment-time">{{comment.createdTime}}</span>
                 </div>
@@ -39,8 +51,10 @@
             </el-container>
             <el-divider class="comment-divider"/>
           </div>
-          <div class="comment-input">
-            <el-input type="textarea" :rows="4" placeholder="comment here" v-model="comment"></el-input>
+          <div v-loading="quillUpdateImg" class="comment-input" style="height: 300px">
+            <quill-editor ref="myTextEditor" v-model="comment" :options="editorOption"
+                          style="height:200px;"></quill-editor>
+            <!--            <el-input ref="comment" type="textarea" :rows="4" placeholder="comment here" v-model="comment"></el-input>-->
             <el-button id="btn-comment" type="primary" @click="submitComment">comment</el-button>
           </div>
         </div>
@@ -60,9 +74,15 @@
         </el-container>
       </div>
     </el-col>
-    <el-dialog @close="loadDetail($route.params.id)" v-if='showCommentsDialog' style="margin-top: -50px" title="comments" :destroy-on-close=true :visible.sync="showCommentsDialog" width="600px" :lock-scroll="true">
-      <ShowComments  ref="showComments" v-bind:commentId="selectedComment" v-bind:postId = "this.$route.params.id" v-bind:commentCreator="selectedCommentCreator"></ShowComments>
+    <el-dialog @close="loadDetail($route.params.id)" v-if='showCommentsDialog' style="margin-top: -50px"
+               title="comments" :destroy-on-close=true :visible.sync="showCommentsDialog" width="600px"
+               :lock-scroll="true">
+      <ShowComments ref="showComments" v-bind:commentId="selectedComment" v-bind:postId="this.$route.params.id"
+                    v-bind:commentCreator="selectedCommentCreator"></ShowComments>
     </el-dialog>
+    <el-upload id="picUploader" ref="upload" action="http://8.208.14.10:3000/upload"
+               :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload" :auto-upload="true">
+    </el-upload>
   </el-row>
 </template>
 
@@ -70,12 +90,34 @@
 import PostService from '../../services/PostService'
 import CommentService from '../../services/CommentService'
 import ShowComments from '../../components/ShowComments'
+import moment from 'moment'
+import { quillEditor } from 'vue-quill-editor'
+import 'quill/dist/quill.snow.css'
+// import * as Quill from 'quill'
 
-let moment = require('moment')
+const toolbarOptions = [
+  ['bold', 'italic', 'underline', 'strike'], // toggled buttons
+  ['blockquote', 'code-block'],
+  [{ 'header': 1 }, { 'header': 2 }], // custom button values
+  [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+  [{ 'script': 'sub' }, { 'script': 'super' }], // superscript/subscript
+  [{ 'indent': '-1' }, { 'indent': '+1' }], // outdent/indent
+  [{ 'direction': 'rtl' }], // text direction
+  [{ 'size': ['small', false, 'large', 'huge'] }], // custom dropdown
+  [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+  [{ 'color': [] }, { 'background': [] }], // dropdown with defaults from theme
+  [{ 'font': [] }],
+  [{ 'align': [] }],
+  ['image'],
+  ['clean'] // remove formatting button
+]
 
 export default {
   name: 'detail',
-  components: { ShowComments },
+  components: {
+    ShowComments,
+    quillEditor
+  },
   data () {
     return {
       post: {
@@ -84,12 +126,30 @@ export default {
       comments: '',
       error: '',
       comment: '',
+      quillUpdateImg: false,
       time: '',
       isPoster: false,
       showCommentsDialog: false,
       selectedComment: '',
       selectedCommentCreator: '',
-      likedComments: []
+      likedComments: [],
+      editorOption: {
+        placeholder: 'Edit your comment here',
+        modules: {
+          toolbar: {
+            container: toolbarOptions, // toolbar
+            handlers: {
+              'image': function (value) {
+                if (value) {
+                  document.querySelector('#picUploader input').click()
+                } else {
+                  this.quill.format('image', false)
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   created () {
@@ -105,12 +165,8 @@ export default {
           var post = response.data.post
           post.createdTime = moment(post.createdTime).format('YYYY-MM-DD HH:mm')
           this.post = post
-          var comments = response.data.comments
-          for (var i = 0; i < comments.length; i++) {
-            comments[i].createdTime = moment(comments[i].createdTime).format('YYYY-MM-DD HH:mm')
-          }
-          this.comments = comments
-          if (this.$store.state.isUserLogin && post.creatorId === this.$store.state.user._id) {
+          this.comments = this.$formatTimeYear(response.data.comments)
+          if (this.$store.state.isUserLogin && this.post.creatorId === this.$store.state.user._id) {
             this.isPoster = true
           }
         })
@@ -188,6 +244,68 @@ export default {
     },
     async likeComment (comment, type, index) {
       this.$likeComment(comment, type, index)
+    },
+    focusComment () {
+      this.$nextTick(() => {
+        this.$refs.myTextEditor.quill.enable(true)
+        this.$refs.myTextEditor.quill.focus()
+      })
+    },
+    onEditorChange ({ editor, html, text }) {
+      this.content = html
+    },
+    beforeAvatarUpload (file) {
+      this.quillUpdateImg = true
+      const isJPG = file.type === 'image/jpeg'
+      const isPNG = file.type === 'image/png'
+      const isLt2M = file.size / 1024 / 1024 < 2
+
+      if (!isJPG && !isPNG) {
+        this.$message.error('Upload image only in JPG/PNG format!')
+      }
+      if (!isLt2M) {
+        this.$message.error('The size of uploaded picture cannot exceed 2MB!')
+      }
+      return (isJPG || isPNG) && isLt2M
+    },
+    handleAvatarSuccess (res, file) {
+      try {
+        let quill = this.$refs.myTextEditor.quill
+        if (res.code === '0000') {
+          let length = quill.getSelection().index
+          quill.insertEmbed(length, 'image', res.url)
+          quill.setSelection(length + 1)
+        } else {
+          this.$message.error('Failed to insert picture')
+        }
+      } catch (e) {
+        this.$message.error('Failed to insert picture')
+      } finally {
+        this.quillUpdateImg = false
+        this.$refs.upload.clearFiles()
+      }
+    },
+    deletePost () {
+      this.$confirm('Are you sure to delete this post?', 'Delete', {
+        confirmButtonText: 'CONFIRM',
+        cancelButtonText: 'CANCEL',
+        type: 'warning'
+      }).then(async () => {
+        PostService.deletePost(this.$route.params.id)
+          .then(res => {
+            if (res.data.code === 0) {
+              this.$message.error(res.data.msg)
+            } else {
+              this.$message.success(res.data.msg)
+              this.$router.push('/')
+            }
+          })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Cancelled'
+        })
+      })
     }
   }
 }
@@ -203,6 +321,7 @@ export default {
   .post-container {
     padding-left: 40px;
     background: white;
+    padding-right: 40px;
   }
 
   .post-creator {
@@ -242,13 +361,16 @@ export default {
   }
 
   .comment-input {
-    display: flex;
+    /*display: flex;*/
     margin-top: 10px;
     margin-bottom: 10px;
   }
 
   #btn-comment {
-    margin-left: 10px;
+    margin-top: 80px;
+    margin-bottom: 10px;
+    /*margin-left: 10px;*/
+    float: right;
   }
 
   p {
@@ -273,6 +395,7 @@ export default {
     color: gray;
     padding-right: 10px;
     cursor: pointer;
+
     img {
       width: 18px;
       height: 18px;
@@ -281,6 +404,7 @@ export default {
       margin-top: -3px;
     }
   }
+
   .el-dialog {
     height: 642px;
   }
@@ -291,6 +415,7 @@ export default {
     overflow: visible;
     overflow-x: hidden !important;
   }
+
   .el-dialog .el-dialog__body {
     padding-right: 5px !important;
   }

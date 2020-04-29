@@ -150,7 +150,6 @@ import MessageService from '../services/MessageService'
 import Chat from './Chat'
 
 export default {
-  // todo: 主页查看帖子和评论显示不全
   name: 'header',
   props: ['fullWidth'],
   data () {
@@ -198,7 +197,7 @@ export default {
         message: 'Logout successfully',
         center: true
       })
-      location.reload()
+      // location.reload()
     },
     onEnterSearch () {
       this.$router.push({ name: 'post-search', params: { keywords: this.keywords } })

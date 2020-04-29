@@ -18,6 +18,12 @@ export default {
       }
       return objects
     }
+    Vue.prototype.$formatTimeClock = function (objects) {
+      for (var i = 0; i < objects.length; i++) {
+        objects[i].createdTime = moment(objects[i].createdTime).format('MMMM Do YYYY, h:mm:ss a')
+      }
+      return objects
+    }
     Vue.prototype.$likeComment = async function (comment, type, index) {
       if (!this.$store.state.isUserLogin) {
         this.$message.warning({

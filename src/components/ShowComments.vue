@@ -107,7 +107,6 @@ export default {
             this.refreshComments()
           }
         } catch (e) {
-          console.log(e)
           this.$message.warning({
             message: 'Failed to Comment. Please retry later',
             center: true
@@ -142,7 +141,6 @@ export default {
             this.refreshComments()
           }
         } catch (e) {
-          console.log(e)
           this.$message.warning({
             message: 'Failed to Comment. Please retry later',
             center: true

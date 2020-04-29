@@ -20,5 +20,8 @@ export default {
   },
   getPopular () {
     return Api().get('/popular')
+  },
+  deletePost (id) {
+    return Api().delete(`/post/delete/${id}`)
   }
 }
