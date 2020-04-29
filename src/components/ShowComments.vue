@@ -9,8 +9,8 @@
               <el-avatar v-else class="avatar" shape="square" :size=30 :src="comment.author.avatarUrl" fit="fit">{{comment.author.username}}</el-avatar>
               <div style="height: 100%;width: 98%;">
                 <a class="username" @click="$router.push('/user/profile/' + comment.creatorId)">{{(comment.author.username)}}</a>
-                <span style="margin-left: 8px;margin-bottom: 5px;display:inline-block" v-if="comment.ref">reply</span>
-                <a v-if="comment.ref" style="float: none;margin-left: 8px" class="username" @click="$router.push('/user/profile/' + comment.ref._id)">{{comment.ref.username}}</a>
+                <span style="margin-left: 8px;margin-bottom: 5px;display:inline-block" v-if="comment.repliedUser">reply</span>
+                <a v-if="comment.repliedUser" style="float: none;margin-left: 8px" class="username" @click="$router.push('/user/profile/' + comment.repliedUser.userId)">{{comment.repliedUser.username}}</a>
                 <span style="float: right;margin-right: 10px">{{comment.createdTime}}</span>
               </div>
             </div>
@@ -127,7 +127,9 @@ export default {
             parentId: this.commentId,
             content: this.commentContent2,
             creatorId: this.$store.state.user._id,
-            ref: this.postId
+            ref: this.postId,
+            repliedUserId: user._id,
+            repliedUserName: user.username
           })
           if (response.data.code === 0) {
             this.error = response.data.msg

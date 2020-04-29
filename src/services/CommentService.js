@@ -15,5 +15,8 @@ export default {
   },
   likeComment (data) {
     return Api().post(`/comment/like/`, data)
+  },
+  getRepliedUser (id) {
+    return Api().get(`/comment/getParentCommentDetail/${id}`)
   }
 }
